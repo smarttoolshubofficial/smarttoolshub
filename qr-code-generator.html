@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>QR Code Generator - SmartToolsHub</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+text-align:center;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+textarea,
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border-radius:8px;
+font-size:16px;
+}
+
+textarea{
+border:1px solid #ccc;
+resize:none;
+height:100px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+#qrcode{
+margin-top:25px;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-decoration:none;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+<h1>QR Code Generator</h1>
+
+<textarea id="textInput" placeholder="Enter text or URL"></textarea>
+
+<button onclick="generateQR()">
+Generate QR Code
+</button>
+
+
+<div id="qrcode"></div>
+
+
+<a id="download" download="qrcode.png">
+Download QR Code
+</a>
+
+
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+
+<script>
+
+const qrBox=document.getElementById("qrcode");
+const download=document.getElementById("download");
+
+
+function generateQR(){
+
+let text=document.getElementById("textInput").value;
+
+
+if(text===""){
+alert("Please enter text or URL");
+return;
+}
+
+
+// Clear previous QR
+qrBox.innerHTML="";
+
+
+new QRCode(qrBox,{
+text:text,
+width:250,
+height:250
+});
+
+
+setTimeout(()=>{
+
+let img=qrBox.querySelector("img");
+
+if(img){
+
+download.href=img.src;
+download.style.display="inline-block";
+
+}
+
+},500);
+
+
+}
+
+</script>
+
+
+</body>
+</html>
