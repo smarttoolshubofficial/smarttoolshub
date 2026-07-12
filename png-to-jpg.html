@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PNG to JPG Converter - SmartToolsHub</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:#fff;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:25px;
+color:#222;
+}
+
+label{
+display:block;
+font-weight:bold;
+margin-top:15px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:8px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:16px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+img{
+width:100%;
+margin-top:20px;
+border-radius:8px;
+display:none;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-align:center;
+text-decoration:none;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>PNG to JPG Converter</h1>
+
+<label>Select PNG Image</label>
+<input type="file" id="imageInput" accept="image/png">
+
+<button onclick="convertJPG()">
+Convert to JPG
+</button>
+
+<img id="preview">
+
+<a id="download" download="converted-image.jpg">
+Download JPG Image
+</a>
+
+</div>
+
+
+<script>
+
+let img = new Image();
+
+const input = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+const download = document.getElementById("download");
+
+
+input.addEventListener("change",function(e){
+
+let file=e.target.files[0];
+
+if(!file) return;
+
+let reader=new FileReader();
+
+reader.onload=function(event){
+
+img.onload=function(){
+
+preview.src=img.src;
+preview.style.display="block";
+
+}
+
+img.src=event.target.result;
+
+}
+
+reader.readAsDataURL(file);
+
+});
+
+
+function convertJPG(){
+
+if(!img.src){
+alert("Please upload a PNG image first!");
+return;
+}
+
+
+let canvas=document.createElement("canvas");
+
+canvas.width=img.width;
+canvas.height=img.height;
+
+
+let ctx=canvas.getContext("2d");
+
+// White background for PNG transparency
+ctx.fillStyle="#ffffff";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+
+ctx.drawImage(img,0,0);
+
+
+let jpgImage=canvas.toDataURL("image/jpeg",0.95);
+
+
+preview.src=jpgImage;
+
+
+download.href=jpgImage;
+download.style.display="block";
+download.innerHTML="Download JPG Image";
+
+}
+
+</script>
+
+</body>
+</html>
