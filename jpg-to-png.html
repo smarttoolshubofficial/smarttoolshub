@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JPG to PNG Converter - SmartToolsHub</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:25px;
+color:#222;
+}
+
+label{
+display:block;
+font-weight:bold;
+margin-top:15px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:8px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:16px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+img{
+width:100%;
+margin-top:20px;
+border-radius:8px;
+display:none;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-align:center;
+text-decoration:none;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>JPG to PNG Converter</h1>
+
+<label>Select JPG Image</label>
+<input type="file" id="imageInput" accept="image/jpeg,image/jpg">
+
+<button onclick="convertPNG()">
+Convert to PNG
+</button>
+
+<img id="preview">
+
+<a id="download" download="converted-image.png">
+Download PNG Image
+</a>
+
+</div>
+
+
+<script>
+
+let img = new Image();
+
+const input = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+const download = document.getElementById("download");
+
+
+input.addEventListener("change",function(e){
+
+let file = e.target.files[0];
+
+if(!file) return;
+
+let reader = new FileReader();
+
+reader.onload=function(event){
+
+img.onload=function(){
+
+preview.src = img.src;
+preview.style.display="block";
+
+}
+
+img.src = event.target.result;
+
+}
+
+reader.readAsDataURL(file);
+
+});
+
+
+function convertPNG(){
+
+if(!img.src){
+alert("Please upload a JPG image first!");
+return;
+}
+
+let canvas = document.createElement("canvas");
+
+canvas.width = img.width;
+canvas.height = img.height;
+
+
+let ctx = canvas.getContext("2d");
+
+ctx.drawImage(img,0,0);
+
+
+let pngImage = canvas.toDataURL("image/png");
+
+
+preview.src = pngImage;
+
+
+download.href = pngImage;
+download.style.display="block";
+download.innerHTML="Download PNG Image";
+
+}
+
+</script>
+
+</body>
+</html>
