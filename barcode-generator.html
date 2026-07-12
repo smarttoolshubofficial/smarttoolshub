@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barcode Generator - SmartToolsHub</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+text-align:center;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+input,
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border-radius:8px;
+font-size:16px;
+}
+
+input{
+border:1px solid #ccc;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+#barcodeContainer{
+margin-top:25px;
+background: #fdfdfd;
+padding: 10px;
+display: inline-block;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-decoration:none;
+border-radius:8px;
+font-weight:bold;
+width: 100%;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Barcode Generator</h1>
+    
+    <input type="text" id="textInput" placeholder="Enter text or number (e.g. 12345678)" value="12345678">
+    
+    <button onclick="generateBarcode()">
+        Generate Barcode
+    </button>
+
+    <div>
+        <div id="barcodeContainer">
+            <!-- Barcode SVG yahan generate hoga -->
+            <svg id="barcode"></svg>
+        </div>
+    </div>
+
+    <a id="download" download="barcode.png">
+        Download Barcode
+    </a>
+</div>
+
+<!-- JsBarcode Library for generating Barcode -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<script>
+const barcodeSvg = document.getElementById("barcode");
+const downloadBtn = document.getElementById("download");
+
+function generateBarcode(){
+    let text = document.getElementById("textInput").value.trim();
+
+    if(text === ""){
+        alert("Please enter text or number");
+        return;
+    }
+
+    try {
+        // Barcode generate karne ka function
+        JsBarcode("#barcode", text, {
+            format: "CODE128",
+            width: 2,
+            height: 100,
+            displayValue: true
+        });
+
+        // Download link setup karna (SVG to PNG conversion)
+        setTimeout(() => {
+            const svgString = new XMLSerializer().serializeToString(barcodeSvg);
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                canvas.width = img.width * 2;
+                canvas.height = img.height * 2;
+                
+                // White Background fill karna background download ke liye
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                downloadBtn.href = canvas.toDataURL('image/png');
+                downloadBtn.style.display = "inline-block";
+            };
+            
+            img.src = URL.createObjectURL(svgBlob);
+        }, 300);
+
+    } catch (error) {
+        alert("Invalid characters for barcode!");
+        downloadBtn.style.display = "none";
+    }
+}
+
+// Pehli baar automatic run karne ke liye
+generateBarcode();
+</script>
+
+</body>
+</html>
+
