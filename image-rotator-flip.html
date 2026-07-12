@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Image Rotator & Flip - SmartToolsHub</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:12px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:16px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+canvas{
+width:100%;
+margin-top:20px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-align:center;
+text-decoration:none;
+border-radius:8px;
+}
+
+.btn-group{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Image Rotator & Flip</h1>
+
+<input type="file" id="imageInput" accept="image/*">
+
+
+<div class="btn-group">
+
+<button onclick="rotateLeft()">Rotate Left</button>
+
+<button onclick="rotateRight()">Rotate Right</button>
+
+<button onclick="flipHorizontal()">Flip Horizontal</button>
+
+<button onclick="flipVertical()">Flip Vertical</button>
+
+</div>
+
+
+<canvas id="canvas"></canvas>
+
+
+<a id="download" download="edited-image.png">
+Download Image
+</a>
+
+
+</div>
+
+
+<script>
+
+const input=document.getElementById("imageInput");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const download=document.getElementById("download");
+
+
+let img=new Image();
+let rotation=0;
+let flipX=1;
+let flipY=1;
+
+
+input.addEventListener("change",function(e){
+
+let file=e.target.files[0];
+
+if(!file)return;
+
+
+let reader=new FileReader();
+
+reader.onload=function(event){
+
+img.onload=function(){
+
+rotation=0;
+flipX=1;
+flipY=1;
+
+drawImage();
+
+}
+
+img.src=event.target.result;
+
+}
+
+reader.readAsDataURL(file);
+
+});
+
+
+function drawImage(){
+
+let width=img.width;
+let height=img.height;
+
+
+if(rotation%180!==0){
+
+canvas.width=height;
+canvas.height=width;
+
+}else{
+
+canvas.width=width;
+canvas.height=height;
+
+}
+
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+
+ctx.save();
+
+ctx.translate(canvas.width/2,canvas.height/2);
+
+ctx.rotate(rotation*Math.PI/180);
+
+ctx.scale(flipX,flipY);
+
+
+ctx.drawImage(
+img,
+-width/2,
+-height/2
+);
+
+
+ctx.restore();
+
+
+updateDownload();
+
+}
+
+
+
+function rotateLeft(){
+
+rotation-=90;
+drawImage();
+
+}
+
+
+function rotateRight(){
+
+rotation+=90;
+drawImage();
+
+}
+
+
+function flipHorizontal(){
+
+flipX*=-1;
+drawImage();
+
+}
+
+
+function flipVertical(){
+
+flipY*=-1;
+drawImage();
+
+}
+
+
+
+function updateDownload(){
+
+let imageData=canvas.toDataURL("image/png");
+
+download.href=imageData;
+download.style.display="block";
+
+}
+
+
+</script>
+
+</body>
+</html>
