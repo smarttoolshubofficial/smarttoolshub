@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PDF to Image Converter - SmartToolsHub</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:16px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+canvas{
+width:100%;
+margin-top:20px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-align:center;
+text-decoration:none;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>PDF to Image Converter</h1>
+
+<input type="file" id="pdfInput" accept="application/pdf">
+
+<button onclick="convertPDF()">
+Convert PDF to Image
+</button>
+
+<canvas id="canvas"></canvas>
+
+<a id="download" download="pdf-page.png">
+Download Image
+</a>
+
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+
+<script>
+
+const input=document.getElementById("pdfInput");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const download=document.getElementById("download");
+
+let pdfFile;
+
+
+
+input.addEventListener("change",function(e){
+
+pdfFile=e.target.files[0];
+
+});
+
+
+
+async function convertPDF(){
+
+if(!pdfFile){
+
+alert("Please upload a PDF file first!");
+
+return;
+
+}
+
+
+let fileReader=new FileReader();
+
+
+fileReader.onload=async function(){
+
+let typedArray=new Uint8Array(this.result);
+
+
+let pdf=await pdfjsLib.getDocument(typedArray).promise;
+
+
+// First page convert
+
+let page=await pdf.getPage(1);
+
+
+let viewport=page.getViewport({
+scale:2
+});
+
+
+canvas.width=viewport.width;
+canvas.height=viewport.height;
+
+
+let renderContext={
+canvasContext:ctx,
+viewport:viewport
+};
+
+
+await page.render(renderContext).promise;
+
+
+let image=canvas.toDataURL("image/png");
+
+
+download.href=image;
+download.style.display="block";
+download.innerHTML="Download PNG Image";
+
+
+};
+
+
+fileReader.readAsArrayBuffer(pdfFile);
+
+
+}
+
+</script>
+
+
+</body>
+</html>
