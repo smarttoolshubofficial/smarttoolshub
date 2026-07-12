@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Image to PDF Converter - SmartToolsHub</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:#fff;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:16px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+img{
+width:100%;
+margin-top:20px;
+border-radius:8px;
+display:none;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-align:center;
+text-decoration:none;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Image to PDF Converter</h1>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<img id="preview">
+
+<button onclick="convertPDF()">
+Convert Image to PDF
+</button>
+
+<a id="download" download="image-to-pdf.pdf">
+Download PDF
+</a>
+
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+<script>
+
+const input=document.getElementById("imageInput");
+const preview=document.getElementById("preview");
+const download=document.getElementById("download");
+
+let imageData="";
+
+
+input.addEventListener("change",function(e){
+
+let file=e.target.files[0];
+
+if(!file)return;
+
+
+let reader=new FileReader();
+
+
+reader.onload=function(event){
+
+imageData=event.target.result;
+
+preview.src=imageData;
+preview.style.display="block";
+
+}
+
+
+reader.readAsDataURL(file);
+
+});
+
+
+
+async function convertPDF(){
+
+if(!imageData){
+
+alert("Please upload an image first!");
+
+return;
+
+}
+
+
+const { jsPDF } = window.jspdf;
+
+
+let pdf=new jsPDF();
+
+
+let img=new Image();
+
+img.src=imageData;
+
+
+img.onload=function(){
+
+
+let width=pdf.internal.pageSize.getWidth();
+
+let height=(img.height/img.width)*width;
+
+
+pdf.addImage(
+imageData,
+'JPEG',
+0,
+10,
+width,
+height
+);
+
+
+let pdfData=pdf.output("datauristring");
+
+
+download.href=pdfData;
+
+download.style.display="block";
+
+download.innerHTML="Download PDF";
+
+
+}
+
+
+}
+
+</script>
+
+
+</body>
+</html>
