@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Image Compressor - SmartToolsHub</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+color:#222;
+margin-bottom:25px;
+}
+
+label{
+display:block;
+font-weight:bold;
+margin-top:15px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:8px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:16px;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+img{
+width:100%;
+margin-top:20px;
+border-radius:8px;
+display:none;
+}
+
+#download{
+display:none;
+margin-top:20px;
+padding:12px;
+background:#16a34a;
+color:white;
+text-align:center;
+text-decoration:none;
+border-radius:8px;
+display:block;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Image Compressor</h1>
+
+<label>Select Image</label>
+<input type="file" id="imageInput" accept="image/*">
+
+<label>Compression Quality</label>
+<input type="range" id="quality" min="10" max="100" value="70">
+
+<p id="qualityText">Quality: 70%</p>
+
+<button onclick="compressImage()">
+Compress Image
+</button>
+
+<img id="preview">
+
+<a id="download" download="compressed-image.jpg">
+Download Compressed Image
+</a>
+
+</div>
+
+
+<script>
+
+let image = new Image();
+let originalSize = 0;
+
+const input = document.getElementById("imageInput");
+const quality = document.getElementById("quality");
+const qualityText = document.getElementById("qualityText");
+const preview = document.getElementById("preview");
+const download = document.getElementById("download");
+
+
+quality.addEventListener("input",function(){
+qualityText.innerHTML="Quality: "+this.value+"%";
+});
+
+
+input.addEventListener("change",function(e){
+
+let file=e.target.files[0];
+
+if(!file) return;
+
+originalSize=file.size;
+
+let reader=new FileReader();
+
+reader.onload=function(event){
+
+image.onload=function(){
+preview.src=image.src;
+preview.style.display="block";
+}
+
+image.src=event.target.result;
+
+}
+
+reader.readAsDataURL(file);
+
+});
+
+
+function compressImage(){
+
+let canvas=document.createElement("canvas");
+
+canvas.width=image.width;
+canvas.height=image.height;
+
+let ctx=canvas.getContext("2d");
+
+ctx.drawImage(image,0,0);
+
+
+let qualityValue=quality.value/100;
+
+
+let compressed=canvas.toDataURL(
+"image/jpeg",
+qualityValue
+);
+
+
+preview.src=compressed;
+
+
+download.href=compressed;
+download.style.display="block";
+
+download.innerHTML="Download Compressed Image";
+
+}
+
+</script>
+
+</body>
+</html>
