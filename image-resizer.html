@@ -3,86 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Resizer - SmartToolsHub</title>
-</head>
 
+<title>Image Resizer - SmartToolsHub</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:#fff;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:25px;
+color:#222;
+}
+
+label{
+display:block;
+margin-top:15px;
+font-weight:bold;
+}
+
+input[type="number"],
+select,
+button,
+input[type="file"] {
+width:100%;
+padding:12px;
+margin-top:8px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:16px;
+}
+
+.checkbox-container {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-top: 15px;
+cursor: pointer;
+}
+
+.checkbox-container input {
+width: auto;
+margin: 0;
+}
+
+button{
+background:#2563eb;
+color:#fff;
+border:none;
+cursor:pointer;
+font-weight:bold;
+margin-top: 20px;
+transition: background 0.2s;
+}
+
+button:hover:not(:disabled){
+background:#1d4ed8;
+}
+
+button:disabled {
+background: #93c5fd;
+cursor: not-allowed;
+}
+
+canvas{
+width:100%;
+max-width:100%;
+height:auto;
+margin-top:20px;
+border:1px solid #ddd;
+border-radius:8px;
+display:none;
+image-rendering:auto;
+}
+
+#download{
+display:none;
+margin-top:20px;
+text-align:center;
+background:#16a34a;
+color:#fff;
+padding:12px;
+border-radius:8px;
+text-decoration:none;
+width: 100%;
+font-weight: bold;
+}
+
+#download:hover {
+background: #15803d;
+}
+
+.quality-text {
+margin-top: 5px;
+font-size: 14px;
+color: #555;
+font-weight: bold;
+}
+
+.stats-container {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 15px;
+margin-top: 20px;
+background: #f8fafc;
+padding: 15px;
+border-radius: 8px;
+border: 1px dashed #cbd5e1;
+display: none;
+}
+
+.stat-box h4 {
+font-size: 13px;
+color: #64748b;
+text-transform: uppercase;
+margin-bottom: 5px;
+}
+
+.stat-box p {
+font-size: 16px;
+font-weight: bold;
+color: #334155;
+}
+
+.saved-badge {
+grid-column: span 2;
+text-align: center;
+background: #dcfce7;
+color: #15803d;
+padding: 8px;
+border-radius: 6px;
+font-weight: bold;
+font-size: 14px;
+margin-top: 5px;
+}
+</style>
+</head>
 <body>
 
-<h1>Image Resizer</h1>
+<div class="container">
+    <h1>Image Resizer</h1>
 
-<input type="file" id="imageInput" accept="image/*"><br><br>
+    <label>Select Image</label>
+    <input type="file" id="imageInput" accept="image/*">
 
-<label>Width (px)</label><br>
-<input type="number" id="width" value="800"><br><br>
+    <label>Width (px)</label>
+    <input type="number" id="width" placeholder="Width">
 
-<label>Height (px)</label><br>
-<input type="number" id="height" value="600"><br><br>
+    <label>Height (px)</label>
+    <input type="number" id="height" placeholder="Height">
 
-<button onclick="resizeImage()">Resize Image</button>
+    <label class="checkbox-container">
+        <input type="checkbox" id="lockRatio" checked>
+        Lock Aspect Ratio
+    </label>
 
-<br><br>
+    <label>Output Format</label>
+    <select id="format">
+        <option value="image/jpeg">JPG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WebP</option>
+    </select>
 
-<canvas id="canvas"></canvas>
+    <label>Image Quality</label>
+    <input type="range" id="quality" min="10" max="100" value="90" style="width:100%; margin-top:8px;">
 
-<br><br>
+    <button id="resizeBtn" disabled>Resize Image</button>
+    
+    <div class="stats-container" id="statsContainer">
+        <div class="stat-box">
+            <h4>Original File</h4>
+            <p id="origRes">-</p>
+            <p id="origSize">-</p>
+        </div>
+        <div class="stat-box">
+            <h4>Resized File</h4>
+            <p id="resRes">-</p>
+            <p id="resSize">-</p>
+        </div>
+        <div id="savedBadge" class="saved-badge">Saved: 0%</div>
+    </div>
 
-<a id="download" download="resized-image.png" style="display:none;">
-Download Image
-</a>
+    <canvas id="canvas"></canvas>
+    <a id="download" href="#">Download Resized Image</a>
+</div>
 
 <script>
-const img=new Image();
+const imageInput = document.getElementById('imageInput');
+const widthInput = document.getElementById('width');
+const heightInput = document.getElementById('height');
+const lockRatio = document.getElementById('lockRatio');
+const formatSelect = document.getElementById('format');
+const qualityInput = document.getElementById('quality');
+const resizeBtn = document.getElementById('resizeBtn');
+const canvas = document.getElementById('canvas');
+const downloadBtn = document.getElementById('download');
+const statsContainer = document.getElementById('statsContainer');
 
-document.getElementById("imageInput").addEventListener("change",function(e){
+const origRes = document.getElementById('origRes');
+const origSize = document.getElementById('origSize');
+const resRes = document.getElementById('resRes');
+const resSize = document.getElementById('resSize');
+const savedBadge = document.getElementById('savedBadge');
 
-const reader=new FileReader();
+const qualityLabel = document.createElement("p");
+qualityLabel.className = "quality-text";
+qualityLabel.textContent = "Quality: 90%";
+qualityInput.after(qualityLabel);
 
-reader.onload=function(event){
-img.src=event.target.result;
-}
-
-reader.readAsDataURL(e.target.files[0]);
-
+qualityInput.addEventListener("input", function () {
+    qualityLabel.textContent = "Quality: " + this.value + "%";
 });
 
-function resizeImage(){
+let originalImage = new Image();
+let aspectImgRatio = 1;
+let originalFileSizeInBytes = 0;
 
-const width=parseInt(document.getElementById("width").value);
+// Helper to format bytes
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 
-const height=parseInt(document.getElementById("height").value);
+// Helper to calculate base64 size
+function getBase64Size(base64String) {
+    const padding = (base64String.endsWith('==')) ? 2 : (base64String.endsWith('=')) ? 1 : 0;
+    return (base64String.length * (3 / 4)) - padding;
+}
 
-const canvas=document.getElementById("canvas");
+imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-const ctx=canvas.getContext("2d");
+    // 1. MIME-type Validation (Image files only)
+    if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image file.");
+        imageInput.value = ""; // Reset input
+        return;
+    }
 
-img.onload=function(){
+    // Hide old results
+    canvas.style.display = "none";
+    downloadBtn.style.display = "none";
+    statsContainer.style.display = "none";
 
-canvas.width=width;
+    originalFileSizeInBytes = file.size;
 
-canvas.height=height;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        originalImage.src = event.target.result;
+    }
+    reader.readAsDataURL(file);
+});
 
-ctx.imageSmoothingEnabled = true;
-ctx.imageSmoothingQuality = "high";
-
-ctx.drawImage(img,0,0,width,height);
-
-const link=document.getElementById("download");
-
-link.href=canvas.toDataURL("image/jpeg",0.95);
-
-link.style.display="inline-block";
-
-link.innerHTML="Download Image";
-
+originalImage.onload = function() {
+    widthInput.value = originalImage.width;
+    heightInput.value = originalImage.height;
+    aspectImgRatio = originalImage.width / originalImage.height;
+    resizeBtn.disabled = false; 
 };
 
-if(img.complete){
+widthInput.addEventListener('input', () => {
+    if (lockRatio.checked && originalImage.src) {
+        heightInput.value = Math.floor(widthInput.value / aspectImgRatio);
+    }
+});
 
-img.onload();
+heightInput.addEventListener('input', () => {
+    if (lockRatio.checked && originalImage.src) {
+        widthInput.value = Math.floor(heightInput.value * aspectImgRatio);
+    }
+});
 
-}
+resizeBtn.addEventListener('click', () => {
+    if (!originalImage.src) return;
 
-}
+    const targetWidth = parseInt(widthInput.value);
+    const targetHeight = parseInt(heightInput.value);
+    
+    if (isNaN(targetWidth) || isNaN(targetHeight) || targetWidth < 1 || targetHeight < 1) {
+        alert("Width and Height must be greater than 0.");
+        return;
+    }
+
+    // 2. Anti-Crash Browser Validation
+    if (targetWidth > 10000 || targetHeight > 10000) {
+        alert("Maximum allowed size is 10000 × 10000 pixels.");
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.clearRect(0, 0, targetWidth, targetHeight);
+    
+    ctx.drawImage(originalImage, 0, 0, targetWidth, targetHeight);
+
+    const selectedFormat = formatSelect.value;
+    const quality = parseInt(qualityInput.value) / 100;
+
+    const dataURL = canvas.toDataURL(selectedFormat, quality);
+    const resizedFileSizeInBytes = getBase64Size(dataURL.split(',')[1]);
+
+    origRes.innerText = `${originalImage.width} × ${originalImage.height}`;
+    origSize.innerText = formatBytes(originalFileSizeInBytes);
+    
+    resRes.innerText = `${targetWidth} × ${targetHeight}`;
+    resSize.innerText = formatBytes(resizedFileSizeInBytes);
+
+    if (resizedFileSizeInBytes < originalFileSizeInBytes) {
+        const savedPercent = Math.round(((originalFileSizeInBytes - resizedFileSizeInBytes) / originalFileSizeInBytes) * 100);
+        savedBadge.innerText = `📉 Saved: ${savedPercent}%`;
+        savedBadge.style.background = "#dcfce7";
+        savedBadge.style.color = "#15803d";
+    } else {
+        const increasedPercent = Math.round(((resizedFileSizeInBytes - originalFileSizeInBytes) / originalFileSizeInBytes) * 100);
+        savedBadge.innerText = `🔺 Size Increased: ${increasedPercent}% (Try reducing quality)`;
+        savedBadge.style.background = "#fee2e2";
+        savedBadge.style.color = "#991b1b";
+    }
+
+    statsContainer.style.display = 'grid';
+
+    const extension = selectedFormat.split('/')[1];
+    const fileName = imageInput.files[0].name.replace(/\.[^/.]+$/, "");
+    downloadBtn.download = `${fileName}-${targetWidth}x${targetHeight}.${extension}`;
+    downloadBtn.href = dataURL;
+    
+    canvas.style.display = 'block';
+    downloadBtn.style.display = 'block';
+});
 </script>
 
 </body>
