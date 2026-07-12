@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Resizer - SmartToolsHub</title>
+</head>
+
+<body>
+
+<h1>Image Resizer</h1>
+
+<input type="file" id="imageInput" accept="image/*"><br><br>
+
+<label>Width (px)</label><br>
+<input type="number" id="width" value="800"><br><br>
+
+<label>Height (px)</label><br>
+<input type="number" id="height" value="600"><br><br>
+
+<button onclick="resizeImage()">Resize Image</button>
+
+<br><br>
+
+<canvas id="canvas"></canvas>
+
+<br><br>
+
+<a id="download" download="resized-image.png" style="display:none;">
+Download Image
+</a>
+
+<script>
+const img=new Image();
+
+document.getElementById("imageInput").addEventListener("change",function(e){
+
+const reader=new FileReader();
+
+reader.onload=function(event){
+img.src=event.target.result;
+}
+
+reader.readAsDataURL(e.target.files[0]);
+
+});
+
+function resizeImage(){
+
+const width=parseInt(document.getElementById("width").value);
+
+const height=parseInt(document.getElementById("height").value);
+
+const canvas=document.getElementById("canvas");
+
+const ctx=canvas.getContext("2d");
+
+img.onload=function(){
+
+canvas.width=width;
+
+canvas.height=height;
+
+ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = "high";
+
+ctx.drawImage(img,0,0,width,height);
+
+const link=document.getElementById("download");
+
+link.href=canvas.toDataURL("image/jpeg",0.95);
+
+link.style.display="inline-block";
+
+link.innerHTML="Download Image";
+
+};
+
+if(img.complete){
+
+img.onload();
+
+}
+
+}
+</script>
+
+</body>
+</html>
