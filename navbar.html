@@ -23,7 +23,18 @@
                     <li><a href="/p/visa-photo-maker.html">🛂 Visa Photo Maker</a></li>
                     <li><a href="/p/aadhaar-photo-resize.html">🆔 Aadhaar Photo Resize</a></li>
                     <li><a href="/p/pan-card-photo-resize.html">💳 PAN Card Photo Resize</a></li>
-                    <li><a href="/p/gov-exam-photo-signature-resizer.html">📝 Gov Exam Photo & Signature Resizer</a></li>
+                    <li><a href="/p/gov-exam-photo-signature-resizer.html">📝 Gov Exam Resizer</a></li>
+                    <li class="sth-divider"></li>
+
+                    <li><a href="/p/image-resizer.html">🖼️ Image Resizer (Aspect Lock)</a></li>
+                    <li><a href="/p/image-compressor.html">📉 Image Compressor (KB Target)</a></li>
+                    <li><a href="/p/image-cropper.html">✂️ Smart Image Cropper</a></li>
+                    <li><a href="/p/rotator-flip.html">🔄 Rotator & Flip</a></li>
+                    <li><a href="/p/image-to-pdf-converter.html">📄 Image to Sharp PDF</a></li>
+                    <li><a href="/p/pdf-to-image-converter.html">🖼️ PDF to Sharp Image</a></li>
+                    <li><a href="/p/jpg-to-png-converter.html">🔄 JPG to PNG Lossless</a></li>
+                    <li><a href="/p/png-to-jpg-converter.html">🔄 PNG to Web JPG</a></li>
+                    <li><a href="/p/qr-code-generator.html">📱 Sharp QR Code Generator</a></li>
                     <li class="sth-divider"></li>
 
                     <li><a href="/p/background-remover.html">✨ Background Remover</a></li>
@@ -89,7 +100,7 @@
     color: #2563eb;
     background: #f1f5f9;
 }
-/* Dropdown CSS */
+/* Dropdown CSS Configuration */
 .sth-dropdown {
     position: relative;
 }
@@ -104,7 +115,9 @@
     margin-top: 10px;
     border-radius: 8px;
     display: none;
-    min-width: 260px; /* Thoda width bada kiya hai taaki bade naam fit aa sakein */
+    min-width: 290px; /* Thoda size badhaya hai taaki naye lambe names perfect fit ho sakein */
+    max-height: 480px; /* Dropdown overflow filter lagaya hai taaki menu screen se bahar na jaye */
+    overflow-y: auto;
     z-index: 999;
 }
 .sth-dropdown-menu li a {
@@ -129,7 +142,7 @@
     color: #334155;
 }
 
-/* Mobile Responsive */
+/* Mobile Responsive Engine */
 @media (max-width: 768px) {
     .sth-menu-toggle { display: block; }
     .sth-nav-menu {
@@ -153,6 +166,8 @@
         padding-left: 15px;
         display: block;
         background: #f8fafc;
+        max-height: none;
+        overflow-y: visible;
     }
 }
 </style>
@@ -163,4 +178,3 @@ function toggleSthMenu() {
     menu.classList.toggle("active");
 }
 </script>
-
