@@ -1,33 +1,42 @@
 <nav class="sth-navbar">
     <div class="sth-nav-container">
-        <!-- Logo / Brand Name -->
         <a href="/" class="sth-logo">SmartToolsHub</a>
         
-        <!-- Mobile Menu Toggle Button -->
         <button class="sth-menu-toggle" onclick="toggleSthMenu()">☰</button>
         
-        <!-- Menu Links -->
         <ul class="sth-nav-menu" id="sthNavMenu">
             <li><a href="/">Home</a></li>
             
-            <!-- Dashboard Link -->
             <li><a href="/p/smarttoolshub-master-dashboard.html">Dashboard</a></li>
             
-            <!-- Dropdown Menu for Tools -->
             <li class="sth-dropdown">
                 <a href="#" class="sth-dropdown-toggle">Our Tools ▼</a>
                 <ul class="sth-dropdown-menu">
-                    <li><a href="/p/image-resizer.html">🖼️ Image Resizer</a></li>
-                    <li><a href="/p/image-compressor.html">📉 Image Compressor</a></li>
-                    <li><a href="/p/crop.html">✂️ Image Cropper</a></li>
-                    <li><a href="/p/rotator-flip.html">🔄 Rotator & Flip</a></li>
-                    <li><a href="/p/image-to-pdf-converter.html">📄 Image to PDF</a></li>
-                    <li><a href="/p/pdf-to-image-converter.html">🖼️ PDF to Image</a></li>
-                    <li><a href="/p/jpg-to-png-converter.html">🔄 JPG to PNG</a></li>
-                    <li><a href="/p/png-to-jpg-converter.html">🔄 PNG to JPG</a></li>
-                    <li class="sth-divider"></li>
-                    <li><a href="/p/qr-code-generator.html">📱 QR Code Generator</a></li>
                     <li><a href="/p/barcode-generator.html">█║ Barcode Generator</a></li>
+                    <li><a href="/p/pdf-merge.html">📄 PDF Merge</a></li>
+                    <li><a href="/p/pdf-split.html">✂️ PDF Split</a></li>
+                    <li><a href="/p/pdf-compress.html">📉 PDF Compress</a></li>
+                    <li><a href="/p/pdf-lock-unlock.html">🔒 PDF Lock/Unlock</a></li>
+                    <li class="sth-divider"></li>
+
+                    <li><a href="/p/passport-photo-maker.html">🖼️ Passport Photo Maker</a></li>
+                    <li><a href="/p/visa-photo-maker.html">🛂 Visa Photo Maker</a></li>
+                    <li><a href="/p/aadhaar-photo-resize.html">🆔 Aadhaar Photo Resize</a></li>
+                    <li><a href="/p/pan-card-photo-resize.html">💳 PAN Card Photo Resize</a></li>
+                    <li><a href="/p/gov-exam-photo-signature-resizer.html">📝 Gov Exam Photo & Signature Resizer</a></li>
+                    <li class="sth-divider"></li>
+
+                    <li><a href="/p/background-remover.html">✨ Background Remover</a></li>
+                    <li><a href="/p/background-changer.html">🎨 Background Changer</a></li>
+                    <li><a href="/p/image-enhancer.html">🚀 Image Enhancer</a></li>
+                    <li><a href="/p/watermark-tool.html">🛡️ Watermark Tool</a></li>
+                    <li><a href="/p/photo-collage-maker.html">📱 Photo Collage Maker</a></li>
+                    <li class="sth-divider"></li>
+
+                    <li><a href="/p/webp-to-jpg.html">🔄 WEBP to JPG</a></li>
+                    <li><a href="/p/jpg-to-webp.html">🔄 JPG to WEBP</a></li>
+                    <li><a href="/p/png-to-webp.html">🔄 PNG to WEBP</a></li>
+                    <li><a href="/p/webp-to-png.html">🔄 WEBP to PNG</a></li>
                 </ul>
             </li>
             
@@ -36,7 +45,6 @@
     </div>
 </nav>
 
-<!-- Styling for Clean Look -->
 <style>
 .sth-navbar {
     background: #ffffff;
@@ -96,7 +104,7 @@
     margin-top: 10px;
     border-radius: 8px;
     display: none;
-    min-width: 220px;
+    min-width: 260px; /* Thoda width bada kiya hai taaki bade naam fit aa sakein */
     z-index: 999;
 }
 .sth-dropdown-menu li a {
@@ -149,7 +157,6 @@
 }
 </style>
 
-<!-- Mobile Toggle Script -->
 <script>
 function toggleSthMenu() {
     var menu = document.getElementById("sthNavMenu");
