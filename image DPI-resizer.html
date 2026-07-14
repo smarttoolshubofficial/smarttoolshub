@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Image Resizer (KB, Pixels, DPI)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="number"], input[type="file"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #3498db;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .ratio-container {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+        .ratio-container input {
+            cursor: pointer;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        #preview-container {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        #preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+        .info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Image Resizer</h2>
+    
+    <div class="form-group">
+        <label>Select Image</label>
+        <input type="file" id="imageInput" accept="image/*">
+        <div class="info" id="originalSizeInfo"></div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label>Width (Pixels)</label>
+            <input type="number" id="widthInput" placeholder="e.g. 800">
+        </div>
+        <div class="form-group">
+            <label>Height (Pixels)</label>
+            <input type="number" id="heightInput" placeholder="e.g. 600">
+        </div>
+    </div>
+
+    <div class="ratio-container">
+        <input type="checkbox" id="maintainRatio" checked>
+        <label for="maintainRatio" style="margin: 0; cursor: pointer;">Maintain Aspect Ratio (Proportions)</label>
+    </div>
+
+    <div class="row" style="margin-top: 15px;">
+        <div class="form-group">
+            <label>Target Size (Max KB)</label>
+            <input type="number" id="kbInput" placeholder="Optional (e.g. 100)">
+        </div>
+        <div class="form-group">
+            <label>DPI (Dots Per Inch)</label>
+            <input type="number" id="dpiInput" value="72" placeholder="e.g. 300">
+        </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 15px;">
+        <label>Format</label>
+        <select id="formatInput">
+            <option value="image/jpeg">JPEG / JPG</option>
+            <option value="image/png">PNG</option>
+            <option value="image/webp">WEBP</option>
+        </select>
+    </div>
+
+    <button id="resizeBtn">Resize & Download</button>
+
+    <div id="preview-container">
+        <h3>Preview</h3>
+        <img id="preview" src="" alt="Preview">
+        <div class="info" id="newSizeInfo"></div>
+    </div>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const widthInput = document.getElementById('widthInput');
+    const heightInput = document.getElementById('heightInput');
+    const maintainRatio = document.getElementById('maintainRatio');
+    const kbInput = document.getElementById('kbInput');
+    const dpiInput = document.getElementById('dpiInput');
+    const formatInput = document.getElementById('formatInput');
+    const resizeBtn = document.getElementById('resizeBtn');
+    const previewContainer = document.getElementById('preview-container');
+    const preview = document.getElementById('preview');
+    const originalSizeInfo = document.getElementById('originalSizeInfo');
+    const newSizeInfo = document.getElementById('newSizeInfo');
+
+    let sourceImage = new Image();
+    let originalFileName = "resized-image";
+    let aspectRatio = 1;
+
+    // Load Image details
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            originalFileName = file.name.substring(0, file.name.lastIndexOf('.'));
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                sourceImage.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+            originalSizeInfo.innerText = `Original Size: ${(file.size / 1024).toFixed(2)} KB`;
+        }
+    });
+
+    sourceImage.onload = function() {
+        widthInput.value = sourceImage.width;
+        heightInput.value = sourceImage.height;
+        aspectRatio = sourceImage.width / sourceImage.height;
+    };
+
+    // Keep aspect ratio dynamically on typing
+    widthInput.addEventListener('input', function() {
+        if (maintainRatio.checked && sourceImage.src) {
+            heightInput.value = Math.round(widthInput.value / aspectRatio);
+        }
+    });
+
+    heightInput.addEventListener('input', function() {
+        if (maintainRatio.checked && sourceImage.src) {
+            widthInput.value = Math.round(heightInput.value * aspectRatio);
+        }
+    });
+
+    // Resize logic with High Quality Engine
+    resizeBtn.addEventListener('click', function() {
+        if (!imageInput.files[0]) {
+            alert("Please select an image first!");
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const targetWidth = parseInt(widthInput.value) || sourceImage.width;
+        const targetHeight = parseInt(heightInput.value) || sourceImage.height;
+
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        // HIGH-QUALITY: Enable smoothing algorithms
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        // Draw image in canvas
+        ctx.drawImage(sourceImage, 0, 0, targetWidth, targetHeight);
+
+        const mimeType = formatInput.value;
+        let quality = 0.95; // Default superb quality
+        let targetKB = parseFloat(kbInput.value);
+
+        if (targetKB && (mimeType === 'image/jpeg' || mimeType === 'image/webp')) {
+            let low = 0.05, high = 1.0;
+            // Precise compression optimization binary search (quality check)
+            for (let i = 0; i < 12; i++) {
+                quality = (low + high) / 2;
+                let base64 = canvas.toDataURL(mimeType, quality);
+                let sizeInKB = atob(base64.split(',')[1]).length / 1024;
+
+                if (sizeInKB > targetKB) {
+                    high = quality;
+                } else {
+                    low = quality;
+                }
+            }
+        }
+
+        // DPI Injection
+        let finalDataUrl = canvas.toDataURL(mimeType, quality);
+        const dpi = parseInt(dpiInput.value) || 72;
+        if (mimeType === 'image/jpeg') {
+            finalDataUrl = changeJpegDpi(finalDataUrl, dpi);
+        }
+
+        let finalSizeInKB = atob(finalDataUrl.split(',')[1]).length / 1024;
+        newSizeInfo.innerText = `New Size: ${finalSizeInKB.toFixed(2)} KB @ ${dpi} DPI`;
+
+        // Preview & Auto Download
+        preview.src = finalDataUrl;
+        previewContainer.style.display = 'block';
+
+        const ext = mimeType.split('/')[1];
+        const downloadLink = document.createElement('a');
+        downloadLink.href = finalDataUrl;
+        downloadLink.download = `${originalFileName}-resized.${ext}`;
+        downloadLink.click();
+    });
+
+    // Inject Custom DPI into JPG header (without ruining pixels or quality)
+    function changeJpegDpi(base64Str, dpi) {
+        const byteString = atob(base64Str.split(',')[1]);
+        let bytes = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+            bytes[i] = byteString.charCodeAt(i);
+        }
+        for (let i = 0; i < bytes.length; i++) {
+            if (bytes[i] === 0xFF && bytes[i+1] === 0xD8 && bytes[i+2] === 0xFF && bytes[i+3] === 0xE0) {
+                bytes[i+13] = 1; // Inch mode marker
+                bytes[i+14] = (dpi >> 8) & 0xFF;
+                bytes[i+15] = dpi & 0xFF;
+                bytes[i+16] = (dpi >> 8) & 0xFF;
+                bytes[i+17] = dpi & 0xFF;
+                break;
+            }
+        }
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return 'data:image/jpeg;base64,' + btoa(binary);
+    }
+</script>
+
+</body>
+</html>
+
